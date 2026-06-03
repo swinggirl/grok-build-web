@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grok Build Web</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: #000;
+      border-bottom: 3px solid #fff;
+      font-size: 1.1rem;
+    }
+
+    #main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    #form-area {
+      flex: 1;
+      padding: 15px 40px 40px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border-right: 3px solid #fff;
+      box-sizing: border-box;
+      padding-top: 0;
+    }
+
+    .prompt-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 120px;
+      margin-top: 15px;
+    }
+
+    .prompt-group h3 {
+      margin: 0 0 10px 0;
+      font-size: 1.2rem;
+      line-height: 1;
+      text-transform: uppercase;
+      border-bottom: 3px solid #fff;
+      padding-bottom: 8px;
+    }
+
+    .prompt-group textarea {
+      flex: 1;
+      height: 100%;
+      resize: none;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    select, textarea, input {
+      width: 100%;
+      padding: 12px;
+      background: #000;
+      border: 3px solid #fff;
+      color: #fff;
+      font-size: 1.1rem;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+
+    textarea:focus, input:focus, select:focus, button:focus {
+      outline: none;
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 30px;
+    }
+
+    #status-area {
+      margin-top: 10px;
+      min-height: 68px;
+      position: relative;
+    }
+
+    button {
+      width: 100%;
+      padding: 18px;
+      font-size: 1.3rem;
+      font-family: inherit;
+      background: #000;
+      color: #fff;
+      border: 3px solid #fff;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      text-transform: uppercase;
+    }
+
+    button:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    button:disabled {
+      background: #222;
+      color: #666;
+      cursor: default;
+      border-color: #444;
+    }
+
+    #sidebar {
+      width: 420px;
+      padding: 15px 20px 40px 20px;
+      border-left: 3px solid #fff;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      padding-top: 15px;
+    }
+
+    #sidebar h3 {
+      margin: 0 0 20px 0;
+      font-size: 1.2rem;
+      line-height: 1;
+      text-align: center;
+      border-bottom: 3px solid #fff;
+      padding-bottom: 8px;
+      margin-top: 0;
+    }
+
+    .empty {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 1.1rem;
+      text-align: center;
+      border: 3px solid #fff;
+      padding: 40px;
+    }
+
+    .media {
+      border: 3px solid #fff;
+      margin-bottom: 25px;
+      padding: 10px;
+    }
+
+    .media video {
+      width: 100%;
+      display: block;
+    }
+
+    .media-prompt {
+      text-align: center;
+      margin: 12px 0;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+
+    .media-prompt.expanded {
+      white-space: normal;
+      overflow: visible;
+    }
+
+    .download-btn {
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      #header { display: none; }
+
+      #mobile-header {
+        display: flex;
+        flex-direction: column;
+        background: #000;
+        padding: 12px 20px;
+      }
+
+      #mobile-header .title {
+        font-size: 1.4rem;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+
+      #mobile-header .line {
+        height: 3px;
+        background: #fff;
+        margin: 6px 0;
+      }
+
+      #mobile-header nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        flex-wrap: wrap;
+      }
+
+      #mobile-header nav a {
+        color: #aaa;
+        text-decoration: none;
+      }
+
+      #mobile-header nav a:hover {
+        color: #fff;
+      }
+
+      #mobile-header nav span {
+        color: #aaa;
+      }
+
+      #main {
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      #form-area {
+        border-right: none;
+        border-bottom: 3px solid #fff;
+        padding: 7px 20px 25px 20px;
+        flex: none;
+      }
+
+      .prompt-group {
+        min-height: 180px;
+      }
+
+      .controls-row {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      #sidebar {
+        width: 100%;
+        border-left: none;
+        border-top: none;
+        padding: 25px 20px;
+        flex: none;
+        overflow: visible;
+      }
+    }
+
+    @media (min-width: 769px) {
+      #mobile-header { display: none; }
+    }
+
+    #welcome {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    #welcome .content {
+      width: 100%;
+      max-width: 460px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Desktop Header -->
+  <div id="header">
+    <div>Grok Build Web</div>
+    <div style="display:flex; gap:15px; align-items:center;">
+      <a href="/faq.html" style="color:#fff;text-decoration:none;">FAQ</a>
+      <span style="color:#fff;">|</span>
+      <a href="https://github.com/swinggirl/grok-build-web" target="_blank" style="color:#fff;text-decoration:none;">Source</a>
+      <span style="color:#fff;">|</span>
+      <a href="https://ko-fi.com/swinggirl" target="_blank" style="color:#fff;text-decoration:none;">Donate</a>
+      <span id="desktop-logout-pipe" style="display:none; color:#fff;">|</span>
+      <a href="/logout" id="desktop-logout" style="display:none; color:#fff;text-decoration:none;">Log Out</a>
+    </div>
+  </div>
+
+  <!-- Mobile Header -->
+  <div id="mobile-header">
+    <div class="title">Grok Build Web</div>
+    <div class="line"></div>
+    <nav>
+      <a href="/faq.html">FAQ</a>
+      <span>|</span>
+      <a href="https://github.com/swinggirl/grok-build-web" target="_blank">Source</a>
+      <span>|</span>
+      <a href="https://ko-fi.com/swinggirl" target="_blank">Donate</a>
+      <span id="mobile-logout-pipe" style="display:none;">|</span>
+      <a href="/logout" id="mobile-logout" style="display:none;">Log Out</a>
+    </nav>
+    <div class="line"></div>
+  </div>
+
+  <!-- Main App -->
+  <div id="main" style="display:none;">
+    <div id="form-area">
+      <div class="prompt-group">
+        <h3>VIDEO PROMPT</h3>
+        <textarea id="prompt" placeholder="Describe the video you want..."></textarea>
+      </div>
+
+      <div class="controls-row">
+        <div class="form-group" style="flex:1">
+          <label>Duration (seconds)</label>
+          <select id="duration">
+            <option value="8">8</option>
+            <option value="10" selected>10</option>
+            <option value="12">12</option>
+            <option value="15">15</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Aspect Ratio</label>
+          <select id="aspect">
+            <option value="16:9" selected>16:9</option>
+            <option value="9:16">9:16</option>
+            <option value="1:1">1:1</option>
+            <option value="4:3">4:3</option>
+            <option value="3:4">3:4</option>
+            <option value="3:2">3:2</option>
+            <option value="2:3">2:3</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Resolution</label>
+          <select id="resolution">
+            <option value="720p" selected>720p</option>
+            <option value="480p">480p</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="status-area">
+        <button id="generate-btn" onclick="generateVideo()">GENERATE VIDEO</button>
+      </div>
+    </div>
+
+    <div id="sidebar">
+      <h3>YOUR CREATIONS</h3>
+      <div id="media-list">
+        <div class="empty">Your creations will go here</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Welcome Screen -->
+  <div id="welcome">
+    <div class="content">
+      <div style="margin-bottom:32px; line-height:1.7;">
+        Welcome to Grok Build Web.<br>
+        Click below to generate a secure authorization code using your xAI account.
+      </div>
+
+      <button id="login-btn" onclick="startLogin()">LOGIN WITH GROK</button>
+
+      <div id="paste-area" style="display:none; margin-top:40px; text-align:left; border:3px solid #fff; padding:20px;">
+        <p style="margin-top:0; font-size:1rem; line-height:1.5;">
+          A new tab just opened. Log in over there.<br><br>
+          After logging in, you will see a screen saying "Could not establish connection" with a copyable code.<br><br>
+          <b>Copy the code from that box and paste it below:</b>
+        </p>
+        <input id="callback-input" type="text" placeholder="Paste the code here (e.g., gs6SNZ...)" style="margin-bottom:15px;">
+        <button id="submit-url-btn" onclick="submitCallback()">VERIFY LOGIN</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.js"></script>
+  <script>
+    let socket, isGenerating = false;
+    let generateInterval;
+
+    async function checkLoginStatus() {
+      try {
+        const res = await fetch('/auth/status');
+        const data = await res.json();
+        if (data.loggedIn) {
+          showMainApp();
+        }
+      } catch (err) {
+        console.error('Failed to check login status', err);
+      }
+    }
+
+    async function startLogin() {
+      try {
+        const res = await fetch('/login-url');
+        const data = await res.json();
+
+        if (data.url) {
+          window.open(data.url, '_blank');
+          document.getElementById('login-btn').style.display = 'none';
+          document.getElementById('paste-area').style.display = 'block';
+        } else {
+          alert('Failed to get login URL');
+        }
+      } catch (err) {
+        alert('Error starting login process');
+      }
+    }
+
+    async function submitCallback() {
+      const inputVal = document.getElementById('callback-input').value.trim();
+      if (!inputVal) return alert('Please paste the code first');
+
+      const btn = document.getElementById('submit-url-btn');
+      btn.disabled = true;
+      btn.innerText = 'VERIFYING...';
+
+      try {
+        const res = await fetch('/auth/callback-manual', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pastedInput: inputVal })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          showMainApp();
+        } else {
+          alert('Login failed: ' + (data.error || 'Unknown error'));
+          btn.disabled = false;
+          btn.innerText = 'VERIFY LOGIN';
+        }
+      } catch (err) {
+        alert('Network error during verification');
+        btn.disabled = false;
+        btn.innerText = 'VERIFY LOGIN';
+      }
+    }
+
+    function showMainApp() {
+      document.getElementById('welcome').style.display = 'none';
+      document.getElementById('main').style.display = 'flex';
+
+      document.getElementById('desktop-logout').style.display = 'inline';
+      document.getElementById('desktop-logout-pipe').style.display = 'inline';
+      document.getElementById('mobile-logout').style.display = 'inline';
+      document.getElementById('mobile-logout-pipe').style.display = 'inline';
+
+      connectSocket();
+    }
+
+    function startGenerateAnimation() {
+      const btn = document.getElementById('generate-btn');
+      btn.disabled = true;
+      let dots = 0;
+      generateInterval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        btn.innerText = 'GENERATING' + '.'.repeat(dots);
+      }, 500);
+    }
+
+    function stopGenerateAnimation() {
+      clearInterval(generateInterval);
+      const btn = document.getElementById('generate-btn');
+      btn.disabled = false;
+      btn.innerText = 'GENERATE VIDEO';
+    }
+
+    function connectSocket() {
+      socket = io();
+
+      socket.on('start', () => {
+        isGenerating = true;
+      });
+
+      socket.on('media', (data) => {
+        isGenerating = false;
+        stopGenerateAnimation();
+
+        const list = document.getElementById('media-list');
+        const empty = list.querySelector('.empty');
+        if (empty) empty.remove();
+
+        const div = document.createElement('div');
+        div.className = 'media';
+
+        const safePrompt = data.prompt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        div.innerHTML = `
+          <video src="${data.url}" controls autoplay loop></video>
+          <div class="media-prompt" onclick="this.classList.toggle('expanded')" title="Click to expand/collapse">${safePrompt}</div>
+          <button class="download-btn" onclick="window.location.href='/download?url=' + encodeURIComponent('${data.url}')">DOWNLOAD</button>
+        `;
+        list.prepend(div);
+      });
+
+      socket.on('rate-limited', () => {
+        stopGenerateAnimation();
+        document.getElementById('generate-btn').disabled = true;
+        alert('Rate limited');
+      });
+
+      socket.on('error', (msg) => {
+        alert(msg);
+        isGenerating = false;
+        stopGenerateAnimation();
+      });
+    }
+
+    function generateVideo() {
+      if (!socket || isGenerating) return;
+      const prompt = document.getElementById('prompt').value.trim();
+      if (!prompt) return alert('Enter a video prompt');
+
+      startGenerateAnimation();
+      isGenerating = true;
+
+      socket.emit('generate', {
+        prompt,
+        duration: document.getElementById('duration').value,
+        aspectRatio: document.getElementById('aspect').value,
+        resolution: document.getElementById('resolution').value
+      });
+    }
+
+    window.onload = function() {
+      checkLoginStatus();
+    };
+  </script>
+</body>
+</html>

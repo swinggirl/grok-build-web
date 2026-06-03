@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ - Grok Build Web</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+  body { 
+    margin:0; padding:0; background:#000; color:#fff; 
+    font-family:'SF Mono','Menlo','Monaco','Consolas',monospace; 
+  }
+  #header { 
+    display:flex; justify-content:space-between; align-items:center; 
+    padding:12px 20px; background:#000; border-bottom:3px solid #fff; font-size:1.1rem; 
+  }
+  #mobile-header { display: none; }
+  
+  .content-wrapper {
+    max-width:800px; 
+    margin-left:auto; 
+    margin-right:auto; 
+    padding: 15px 20px 40px 20px;   /* ← tighter top spacing to match index.html */
+    line-height:1.7;
+  }
+  
+  h1 { border-bottom:3px solid #fff; padding-bottom:15px; }
+  h2 { margin-top:40px; }
+  a { color:#fff; }
+
+  @media (max-width: 768px) {
+    #header { display: none; }
+    
+    #mobile-header { display: flex; flex-direction: column; background:#000; padding:12px 20px; }
+    #mobile-header .title { font-size:1.4rem; text-align:center; margin-bottom:8px; }
+    #mobile-header .line { height:3px; background:#fff; margin:6px 0; }
+    
+    #mobile-header nav { display:flex; justify-content:center; align-items: center; gap:8px; font-size:0.95rem; flex-wrap: wrap; }
+    #mobile-header nav a { color:#aaa; text-decoration:none; }
+    #mobile-header nav a:hover { color:#fff; }
+    #mobile-header nav span { color:#aaa; }
+    
+    .content-wrapper { padding: 15px 20px 40px 20px; }
+  }
+  @media (min-width: 769px) {
+    #mobile-header { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="header">
+    <div>Grok Build Web</div>
+    <div style="display:flex; gap:15px; align-items:center;">
+      <a href="/" style="color:#fff;text-decoration:none;">Home</a>
+      <span style="color:#fff;">|</span>
+      <a href="https://github.com/swinggirl/grok-build-web" target="_blank" style="color:#fff;text-decoration:none;">Source</a>
+      <span style="color:#fff;">|</span>
+      <a href="https://ko-fi.com/swinggirl" target="_blank" style="color:#fff;text-decoration:none;">Donate</a>
+      <span id="desktop-logout-pipe" style="display:none; color:#fff;">|</span>
+      <a href="/logout" id="desktop-logout" style="display:none; color:#fff;text-decoration:none;">Log Out</a>
+    </div>
+  </div>
+
+  <div id="mobile-header">
+    <div class="title">Grok Build Web</div>
+    <div class="line"></div>
+    <nav>
+      <a href="/">Home</a>
+      <span>|</span>
+      <a href="https://github.com/swinggirl/grok-build-web" target="_blank">Source</a>
+      <span>|</span>
+      <a href="https://ko-fi.com/swinggirl" target="_blank">Donate</a>
+      <span id="mobile-logout-pipe" style="display:none;">|</span>
+      <a href="/logout" id="mobile-logout" style="display:none;">Log Out</a>
+    </nav>
+    <div class="line"></div>
+  </div>
+
+  <div class="content-wrapper">
+    <h1>FAQ</h1>
+
+    <h2>What is this?</h2>
+    <p>This is a vibe-coded interface for using Grok Build's video generation function in your browser. It's intended for those who do not want to deal with the terminal for any reason, and for fun.</p>
+
+    <h2>How does login work?</h2>
+    <p>When you click "Login with Grok," you are redirected to xAI's official authentication servers. You log in securely there, and xAI provides us with a temporary token that allows the site to generate videos on your behalf. We use the exact same OpenID Connect (OIDC) flow that the official Grok Build CLI uses.</p>
+
+    <h2>Do you store my password or API keys?</h2>
+    <p>No. Because you authenticate directly on xAI's domain, we never see your password. We do not use or require API keys. We only store the access token xAI gives us in a local, private database to keep you logged in across sessions.</p>
+
+    <h2>Why am I waiting in line?</h2>
+    <p>I'm running this on my home server using consumer fiber internet that I also use for many other things. To keep everything running smoothly for everyone, only 15 people are allowed to be generating videos at any given time.</p>
+
+    <h2>Can I host this myself?</h2>
+    <p>Yes. I encourage it! The full source code is available via the "Source" link in the header.</p>
+
+    <p style="margin-top:60px;">
+      For any other questions, email me at <a href="mailto:swinggirl@proton.me">swinggirl@proton.me</a>
+    </p>
+  </div>
+
+  <script>
+    // automatically check if the user is logged in so we can show the log out button
+    window.onload = async function() {
+      try {
+        const res = await fetch('/auth/status');
+        const data = await res.json();
+        if (data.loggedIn) {
+          document.getElementById('desktop-logout').style.display = 'inline';
+          document.getElementById('desktop-logout-pipe').style.display = 'inline';
+          document.getElementById('mobile-logout').style.display = 'inline';
+          document.getElementById('mobile-logout-pipe').style.display = 'inline';
+        }
+      } catch (err) {
+        console.error('Failed to check login status', err);
+      }
+    };
+  </script>
+</body>
+</html>

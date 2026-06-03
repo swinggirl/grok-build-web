@@ -1,0 +1,12 @@
+{
+  "name": "grok-build-web",
+  "version": "3.0.0",
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.8.0",
+    "better-sqlite3": "^11.0.0",
+    "express-session": "^1.18.0",
+    "connect-sqlite3": "^0.9.15",
+    "openid-client": "^5.6.5"
+  }
+}
