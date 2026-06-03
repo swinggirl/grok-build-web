@@ -1,4 +1,4 @@
-⚠ **UPDATE: Text-to-video functionality has been stripped from Grok Build, it still works using this tool, but it is heavily moderated. There is little reason to use this at this point. The live site has been taken down for this reason.** ⚠
+⚠ **UPDATE: Text-to-video functionality has been stripped from Grok Build, it still works using this tool, but it is heavily moderated. There is little reason to use this at this point. The live site has been taken down for this reason.**
 
 # Grok Build Web
 
