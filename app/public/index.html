@@ -56,12 +56,8 @@
   <div id="header">
     <div>Grok Build Web</div>
     <div style="display:flex; gap:15px; align-items:center;">
-      <a href="/faq.html" style="color:#fff;text-decoration:none;">FAQ</a>
-      <span style="color:#fff;">|</span>
       <a href="https://github.com/swinggirl/grok-build-web" target="_blank" style="color:#fff;text-decoration:none;">Source</a>
       <span style="color:#fff;">|</span>
-      <a href="https://ko-fi.com/swinggirl" target="_blank" style="color:#fff;text-decoration:none;">Donate</a>
-      <span id="desktop-logout-pipe" style="display:none; color:#fff;">|</span>
       <a href="#" id="desktop-logout" onclick="logout()" style="display:none; color:#fff;text-decoration:none;">Log Out</a>
     </div>
   </div>
@@ -71,12 +67,8 @@
     <div class="title">Grok Build Web</div>
     <div class="line"></div>
     <nav>
-      <a href="/faq.html">FAQ</a>
-      <span>|</span>
       <a href="https://github.com/swinggirl/grok-build-web" target="_blank">Source</a>
       <span>|</span>
-      <a href="https://ko-fi.com/swinggirl" target="_blank">Donate</a>
-      <span id="mobile-logout-pipe" style="display:none;">|</span>
       <a href="#" id="mobile-logout" onclick="logout()" style="display:none;">Log Out</a>
     </nav>
     <div class="line"></div>
@@ -318,13 +310,21 @@
         });
 
         const startData = await startRes.json();
-        if (!startData.request_id) throw new Error(startData.error || 'Failed to start generation');
+
+        if (!startData.request_id) {
+          isGenerating = false;
+          stopGenerateAnimation();
+          const msg = startData.error || 'Failed to start generation';
+          return alert(msg.toLowerCase().includes('moderat') ? 'Content was moderated.' : msg);
+        }
 
         const requestId = startData.request_id;
-        let done = false;
+        let attempts = 0;
+        const maxAttempts = 50; // ~3.3 minutes
 
-        while (!done) {
+        while (attempts < maxAttempts) {
           await new Promise(r => setTimeout(r, 4000));
+          attempts++;
 
           const statusRes = await fetch(`https://api.x.ai/v1/videos/${requestId}`, {
             headers: {
@@ -353,15 +353,31 @@
               <button class="download-btn" onclick="window.location.href='/download?url=' + encodeURIComponent('${statusData.video.url}')">DOWNLOAD</button>
             `;
             list.prepend(div);
-            done = true;
+            return;
 
-          } else if (statusData.status === 'failed' || statusData.status === 'expired') {
+          } else if (statusData.status === 'failed' || 
+                     statusData.status === 'expired' || 
+                     statusData.error) {
+
             isGenerating = false;
             stopGenerateAnimation();
-            alert('Generation failed or expired.');
-            done = true;
+
+            const errorMsg = statusData.error || '';
+            if (errorMsg.toLowerCase().includes('moderat') || 
+                errorMsg.toLowerCase().includes('violation') || 
+                errorMsg.toLowerCase().includes('policy')) {
+              return alert('Content was moderated.');
+            } else {
+              return alert(errorMsg || 'Generation failed.');
+            }
           }
         }
+
+        // Timeout after ~3.3 minutes
+        isGenerating = false;
+        stopGenerateAnimation();
+        alert('Generation timed out. The content may have been moderated.');
+
       } catch (err) {
         isGenerating = false;
         stopGenerateAnimation();
