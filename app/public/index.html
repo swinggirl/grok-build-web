@@ -6,290 +6,48 @@
   <title>Grok Build Web</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #000;
-      color: #fff;
-      font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+    body { margin:0; padding:0; background:#000; color:#fff; font-family:'SF Mono','Menlo','Monaco','Consolas',monospace; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+    #header { display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:#000; border-bottom:3px solid #fff; font-size:1.1rem; }
+    #main { display:flex; flex:1; overflow:hidden; }
+    #form-area { flex:1; padding:15px 40px 40px 40px; display:flex; flex-direction:column; gap:20px; border-right:3px solid #fff; box-sizing:border-box; padding-top:0; }
+    .prompt-group { flex:1; display:flex; flex-direction:column; min-height:120px; margin-top:15px; }
+    .prompt-group h3 { margin:0 0 10px 0; font-size:1.2rem; line-height:1; text-transform:uppercase; border-bottom:3px solid #fff; padding-bottom:8px; }
+    .prompt-group textarea { flex:1; height:100%; resize:none; overflow-y:auto; }
+    .form-group { margin-bottom:10px; }
+    label { display:block; margin-bottom:10px; font-size:1.1rem; line-height:1; }
+    select, textarea, input { width:100%; padding:12px; background:#000; border:3px solid #fff; color:#fff; font-size:1.1rem; font-family:inherit; box-sizing:border-box; }
+    textarea:focus, input:focus, select:focus, button:focus { outline:none; }
+    .controls-row { display:flex; gap:30px; }
+    #status-area { margin-top:10px; min-height:68px; position:relative; }
+    button { width:100%; padding:18px; font-size:1.3rem; font-family:inherit; background:#000; color:#fff; border:3px solid #fff; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; box-sizing:border-box; text-transform:uppercase; }
+    button:hover { background:#fff; color:#000; }
+    button:disabled { background:#222; color:#666; cursor:default; border-color:#444; }
+    #sidebar { width:420px; padding:15px 20px 40px 20px; border-left:3px solid #fff; overflow-y:auto; display:flex; flex-direction:column; box-sizing:border-box; padding-top:15px; }
+    #sidebar h3 { margin:0 0 20px 0; font-size:1.2rem; line-height:1; text-align:center; border-bottom:3px solid #fff; padding-bottom:8px; margin-top:0; }
+    .empty { flex:1; display:flex; align-items:center; justify-content:center; color:#666; font-size:1.1rem; text-align:center; border:3px solid #fff; padding:40px; }
+    .media { border:3px solid #fff; margin-bottom:25px; padding:10px; }
+    .media video { width:100%; display:block; }
+    .media-prompt { text-align:center; margin:12px 0; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; }
+    .media-prompt.expanded { white-space:normal; overflow:visible; }
+    .download-btn { margin-top:10px; }
+    @media (max-width:768px) {
+      #header { display:none; }
+      #mobile-header { display:flex; flex-direction:column; background:#000; padding:12px 20px; }
+      #mobile-header .title { font-size:1.4rem; text-align:center; margin-bottom:8px; }
+      #mobile-header .line { height:3px; background:#fff; margin:6px 0; }
+      #mobile-header nav { display:flex; justify-content:center; align-items:center; gap:8px; font-size:0.95rem; flex-wrap:wrap; }
+      #mobile-header nav a { color:#aaa; text-decoration:none; }
+      #mobile-header nav a:hover { color:#fff; }
+      #mobile-header nav span { color:#aaa; }
+      #main { flex-direction:column; overflow-y:auto; }
+      #form-area { border-right:none; border-bottom:3px solid #fff; padding:7px 20px 25px 20px; flex:none; }
+      .prompt-group { min-height:180px; }
+      .controls-row { flex-direction:column; gap:15px; }
+      #sidebar { width:100%; border-left:none; border-top:none; padding:25px 20px; flex:none; overflow:visible; }
     }
-
-    #header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 20px;
-      background: #000;
-      border-bottom: 3px solid #fff;
-      font-size: 1.1rem;
-    }
-
-    #main {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    #form-area {
-      flex: 1;
-      padding: 15px 40px 40px 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      border-right: 3px solid #fff;
-      box-sizing: border-box;
-      padding-top: 0;
-    }
-
-    .prompt-group {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 120px;
-      margin-top: 15px;
-    }
-
-    .prompt-group h3 {
-      margin: 0 0 10px 0;
-      font-size: 1.2rem;
-      line-height: 1;
-      text-transform: uppercase;
-      border-bottom: 3px solid #fff;
-      padding-bottom: 8px;
-    }
-
-    .prompt-group textarea {
-      flex: 1;
-      height: 100%;
-      resize: none;
-      overflow-y: auto;
-    }
-
-    .form-group {
-      margin-bottom: 10px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 1.1rem;
-      line-height: 1;
-    }
-
-    select, textarea, input {
-      width: 100%;
-      padding: 12px;
-      background: #000;
-      border: 3px solid #fff;
-      color: #fff;
-      font-size: 1.1rem;
-      font-family: inherit;
-      box-sizing: border-box;
-    }
-
-    textarea:focus, input:focus, select:focus, button:focus {
-      outline: none;
-    }
-
-    .controls-row {
-      display: flex;
-      gap: 30px;
-    }
-
-    #status-area {
-      margin-top: 10px;
-      min-height: 68px;
-      position: relative;
-    }
-
-    button {
-      width: 100%;
-      padding: 18px;
-      font-size: 1.3rem;
-      font-family: inherit;
-      background: #000;
-      color: #fff;
-      border: 3px solid #fff;
-      cursor: pointer;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-      text-transform: uppercase;
-    }
-
-    button:hover {
-      background: #fff;
-      color: #000;
-    }
-
-    button:disabled {
-      background: #222;
-      color: #666;
-      cursor: default;
-      border-color: #444;
-    }
-
-    #sidebar {
-      width: 420px;
-      padding: 15px 20px 40px 20px;
-      border-left: 3px solid #fff;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-      padding-top: 15px;
-    }
-
-    #sidebar h3 {
-      margin: 0 0 20px 0;
-      font-size: 1.2rem;
-      line-height: 1;
-      text-align: center;
-      border-bottom: 3px solid #fff;
-      padding-bottom: 8px;
-      margin-top: 0;
-    }
-
-    .empty {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #666;
-      font-size: 1.1rem;
-      text-align: center;
-      border: 3px solid #fff;
-      padding: 40px;
-    }
-
-    .media {
-      border: 3px solid #fff;
-      margin-bottom: 25px;
-      padding: 10px;
-    }
-
-    .media video {
-      width: 100%;
-      display: block;
-    }
-
-    .media-prompt {
-      text-align: center;
-      margin: 12px 0;
-      font-size: 0.95rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      cursor: pointer;
-    }
-
-    .media-prompt.expanded {
-      white-space: normal;
-      overflow: visible;
-    }
-
-    .download-btn {
-      margin-top: 10px;
-    }
-
-    @media (max-width: 768px) {
-      #header { display: none; }
-
-      #mobile-header {
-        display: flex;
-        flex-direction: column;
-        background: #000;
-        padding: 12px 20px;
-      }
-
-      #mobile-header .title {
-        font-size: 1.4rem;
-        text-align: center;
-        margin-bottom: 8px;
-      }
-
-      #mobile-header .line {
-        height: 3px;
-        background: #fff;
-        margin: 6px 0;
-      }
-
-      #mobile-header nav {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.95rem;
-        flex-wrap: wrap;
-      }
-
-      #mobile-header nav a {
-        color: #aaa;
-        text-decoration: none;
-      }
-
-      #mobile-header nav a:hover {
-        color: #fff;
-      }
-
-      #mobile-header nav span {
-        color: #aaa;
-      }
-
-      #main {
-        flex-direction: column;
-        overflow-y: auto;
-      }
-
-      #form-area {
-        border-right: none;
-        border-bottom: 3px solid #fff;
-        padding: 7px 20px 25px 20px;
-        flex: none;
-      }
-
-      .prompt-group {
-        min-height: 180px;
-      }
-
-      .controls-row {
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      #sidebar {
-        width: 100%;
-        border-left: none;
-        border-top: none;
-        padding: 25px 20px;
-        flex: none;
-        overflow: visible;
-      }
-    }
-
-    @media (min-width: 769px) {
-      #mobile-header { display: none; }
-    }
-
-    #welcome {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      padding: 20px;
-    }
-
-    #welcome .content {
-      width: 100%;
-      max-width: 460px;
-      text-align: center;
-    }
+    @media (min-width:769px) { #mobile-header { display:none; } }
+    #welcome { display:flex; align-items:center; justify-content:center; height:100vh; padding:20px; }
+    #welcome .content { width:100%; max-width:460px; text-align:center; }
   </style>
 </head>
 <body>
@@ -304,7 +62,7 @@
       <span style="color:#fff;">|</span>
       <a href="https://ko-fi.com/swinggirl" target="_blank" style="color:#fff;text-decoration:none;">Donate</a>
       <span id="desktop-logout-pipe" style="display:none; color:#fff;">|</span>
-      <a href="/logout" id="desktop-logout" style="display:none; color:#fff;text-decoration:none;">Log Out</a>
+      <a href="#" id="desktop-logout" onclick="logout()" style="display:none; color:#fff;text-decoration:none;">Log Out</a>
     </div>
   </div>
 
@@ -319,7 +77,7 @@
       <span>|</span>
       <a href="https://ko-fi.com/swinggirl" target="_blank">Donate</a>
       <span id="mobile-logout-pipe" style="display:none;">|</span>
-      <a href="/logout" id="mobile-logout" style="display:none;">Log Out</a>
+      <a href="#" id="mobile-logout" onclick="logout()" style="display:none;">Log Out</a>
     </nav>
     <div class="line"></div>
   </div>
@@ -331,7 +89,6 @@
         <h3>VIDEO PROMPT</h3>
         <textarea id="prompt" placeholder="Describe the video you want..."></textarea>
       </div>
-
       <div class="controls-row">
         <div class="form-group" style="flex:1">
           <label>Duration (seconds)</label>
@@ -362,7 +119,6 @@
           </select>
         </div>
       </div>
-
       <div id="status-area">
         <button id="generate-btn" onclick="generateVideo()">GENERATE VIDEO</button>
       </div>
@@ -370,9 +126,7 @@
 
     <div id="sidebar">
       <h3>YOUR CREATIONS</h3>
-      <div id="media-list">
-        <div class="empty">Your creations will go here</div>
-      </div>
+      <div id="media-list"><div class="empty">Your creations will go here</div></div>
     </div>
   </div>
 
@@ -383,9 +137,7 @@
         Welcome to Grok Build Web.<br>
         Click below to generate a secure authorization code using your xAI account.
       </div>
-
       <button id="login-btn" onclick="startLogin()">LOGIN WITH GROK</button>
-
       <div id="paste-area" style="display:none; margin-top:40px; text-align:left; border:3px solid #fff; padding:20px;">
         <p style="margin-top:0; font-size:1rem; line-height:1.5;">
           A new tab just opened. Log in over there.<br><br>
@@ -400,18 +152,44 @@
 
   <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.js"></script>
   <script>
-    let socket, isGenerating = false;
+    let socket;
+    let isGenerating = false;
     let generateInterval;
 
-    async function checkLoginStatus() {
+    function getAccessToken() {
+      return localStorage.getItem('access_token');
+    }
+
+    async function refreshAccessToken() {
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (!refreshToken) return null;
+
       try {
-        const res = await fetch('/auth/status');
+        const res = await fetch('https://auth.x.ai/oauth2/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken,
+            client_id: 'b1a00492-073a-47ea-816f-4c329264a828'
+          })
+        });
         const data = await res.json();
-        if (data.loggedIn) {
-          showMainApp();
+        if (data.access_token) {
+          localStorage.setItem('access_token', data.access_token);
+          if (data.refresh_token) localStorage.setItem('refresh_token', data.refresh_token);
+          return data.access_token;
         }
-      } catch (err) {
-        console.error('Failed to check login status', err);
+      } catch (e) {
+        console.error('Token refresh failed');
+      }
+      return null;
+    }
+
+    function checkLoginStatus() {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        showMainApp();
       }
     }
 
@@ -419,8 +197,8 @@
       try {
         const res = await fetch('/login-url');
         const data = await res.json();
-
-        if (data.url) {
+        if (data.url && data.code_verifier) {
+          sessionStorage.setItem('code_verifier', data.code_verifier);
           window.open(data.url, '_blank');
           document.getElementById('login-btn').style.display = 'none';
           document.getElementById('paste-area').style.display = 'block';
@@ -436,27 +214,39 @@
       const inputVal = document.getElementById('callback-input').value.trim();
       if (!inputVal) return alert('Please paste the code first');
 
+      const code_verifier = sessionStorage.getItem('code_verifier');
+      if (!code_verifier) return alert('Login session expired. Please try again.');
+
       const btn = document.getElementById('submit-url-btn');
       btn.disabled = true;
       btn.innerText = 'VERIFYING...';
 
       try {
-        const res = await fetch('/auth/callback-manual', {
+        const res = await fetch('/auth/exchange', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pastedInput: inputVal })
+          body: JSON.stringify({
+            code: inputVal,
+            code_verifier: code_verifier
+          })
         });
 
         const data = await res.json();
-        if (data.success) {
+
+        if (data.access_token) {
+          localStorage.setItem('access_token', data.access_token);
+          if (data.refresh_token) {
+            localStorage.setItem('refresh_token', data.refresh_token);
+          }
+          sessionStorage.removeItem('code_verifier');
           showMainApp();
         } else {
-          alert('Login failed: ' + (data.error || 'Unknown error'));
+          alert('Login failed: ' + (data.error || 'Invalid code'));
           btn.disabled = false;
           btn.innerText = 'VERIFY LOGIN';
         }
       } catch (err) {
-        alert('Network error during verification');
+        alert('Error during login verification');
         btn.disabled = false;
         btn.innerText = 'VERIFY LOGIN';
       }
@@ -465,13 +255,17 @@
     function showMainApp() {
       document.getElementById('welcome').style.display = 'none';
       document.getElementById('main').style.display = 'flex';
-
       document.getElementById('desktop-logout').style.display = 'inline';
       document.getElementById('desktop-logout-pipe').style.display = 'inline';
       document.getElementById('mobile-logout').style.display = 'inline';
       document.getElementById('mobile-logout-pipe').style.display = 'inline';
-
       connectSocket();
+    }
+
+    function logout() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      window.location.href = '/';
     }
 
     function startGenerateAnimation() {
@@ -491,61 +285,92 @@
       btn.innerText = 'GENERATE VIDEO';
     }
 
-    function connectSocket() {
-      socket = io();
+    async function generateVideo() {
+      if (isGenerating) return;
 
-      socket.on('start', () => {
-        isGenerating = true;
-      });
-
-      socket.on('media', (data) => {
-        isGenerating = false;
-        stopGenerateAnimation();
-
-        const list = document.getElementById('media-list');
-        const empty = list.querySelector('.empty');
-        if (empty) empty.remove();
-
-        const div = document.createElement('div');
-        div.className = 'media';
-
-        const safePrompt = data.prompt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-        div.innerHTML = `
-          <video src="${data.url}" controls autoplay loop></video>
-          <div class="media-prompt" onclick="this.classList.toggle('expanded')" title="Click to expand/collapse">${safePrompt}</div>
-          <button class="download-btn" onclick="window.location.href='/download?url=' + encodeURIComponent('${data.url}')">DOWNLOAD</button>
-        `;
-        list.prepend(div);
-      });
-
-      socket.on('rate-limited', () => {
-        stopGenerateAnimation();
-        document.getElementById('generate-btn').disabled = true;
-        alert('Rate limited');
-      });
-
-      socket.on('error', (msg) => {
-        alert(msg);
-        isGenerating = false;
-        stopGenerateAnimation();
-      });
-    }
-
-    function generateVideo() {
-      if (!socket || isGenerating) return;
       const prompt = document.getElementById('prompt').value.trim();
       if (!prompt) return alert('Enter a video prompt');
+
+      let accessToken = getAccessToken();
+      if (!accessToken) return alert('You are not logged in.');
 
       startGenerateAnimation();
       isGenerating = true;
 
-      socket.emit('generate', {
-        prompt,
-        duration: document.getElementById('duration').value,
-        aspectRatio: document.getElementById('aspect').value,
-        resolution: document.getElementById('resolution').value
-      });
+      try {
+        accessToken = await refreshAccessToken() || accessToken;
+
+        const startRes = await fetch('https://api.x.ai/v1/videos/generations', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'X-XAI-Token-Auth': 'xai-grok-cli',
+            'x-grok-client-version': '0.2.16',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: "grok-imagine-video",
+            prompt,
+            duration: parseInt(document.getElementById('duration').value),
+            aspect_ratio: document.getElementById('aspect').value,
+            resolution: document.getElementById('resolution').value
+          })
+        });
+
+        const startData = await startRes.json();
+        if (!startData.request_id) throw new Error(startData.error || 'Failed to start generation');
+
+        const requestId = startData.request_id;
+        let done = false;
+
+        while (!done) {
+          await new Promise(r => setTimeout(r, 4000));
+
+          const statusRes = await fetch(`https://api.x.ai/v1/videos/${requestId}`, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'X-XAI-Token-Auth': 'xai-grok-cli'
+            }
+          });
+
+          const statusData = await statusRes.json();
+
+          if (statusData.status === 'done') {
+            isGenerating = false;
+            stopGenerateAnimation();
+
+            const list = document.getElementById('media-list');
+            const empty = list.querySelector('.empty');
+            if (empty) empty.remove();
+
+            const div = document.createElement('div');
+            div.className = 'media';
+            const safePrompt = prompt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            div.innerHTML = `
+              <video src="${statusData.video.url}" controls autoplay loop></video>
+              <div class="media-prompt" onclick="this.classList.toggle('expanded')">${safePrompt}</div>
+              <button class="download-btn" onclick="window.location.href='/download?url=' + encodeURIComponent('${statusData.video.url}')">DOWNLOAD</button>
+            `;
+            list.prepend(div);
+            done = true;
+
+          } else if (statusData.status === 'failed' || statusData.status === 'expired') {
+            isGenerating = false;
+            stopGenerateAnimation();
+            alert('Generation failed or expired.');
+            done = true;
+          }
+        }
+      } catch (err) {
+        isGenerating = false;
+        stopGenerateAnimation();
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function connectSocket() {
+      socket = io();
     }
 
     window.onload = function() {
